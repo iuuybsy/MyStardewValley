@@ -90,7 +90,6 @@ class Player(pygame.sprite.Sprite):
                 self.timers['seed switch'].activate()
                 self.seed_index += 1
                 self.selected_seed = self.seeds[self.seed_index % len(self.seeds)]
-                print(self.selected_seed)
 
         self.get_status()
 
