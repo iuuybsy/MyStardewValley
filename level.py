@@ -27,35 +27,31 @@ class Level:
     def setup(self):
         tmx_data = load_pygame('data/map.tmx')
 
-        for layer in ['HouseFloor', 'HouseFurnitureBottom', 'HouseWalls', 'HouseFurnitureTop']:
+        # house
+        for layer in ['HouseFloor', 'HouseFurnitureBottom']:
             for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
-                Generic(pos=(x * TILESIZE, y * TILESIZE),
-                        surf=surf,
-                        groups=self.all_sprites,
-                        z=LAYERS['house bottom'])
+                Generic((x * TILE_SIZE, y * TILE_SIZE), surf, self.all_sprites, LAYERS['house bottom'])
 
+        for layer in ['HouseWalls', 'HouseFurnitureTop']:
+            for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
+                Generic((x * TILE_SIZE, y * TILE_SIZE), surf, self.all_sprites)
+
+        # Fence
         for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
-            Generic(pos=(x * TILESIZE, y * TILESIZE),
-                    surf=surf,
-                    groups=self.all_sprites,
-                    z=LAYERS['house bottom'])
+            Generic((x * TILE_SIZE, y * TILE_SIZE), surf, self.all_sprites)
 
+        # water
         water_frames = import_folder('graphics/water')
         for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
-            Water(pos=(x * TILESIZE, y * TILESIZE),
-                  frames=water_frames,
-                  groups=self.all_sprites)
+            Water((x * TILE_SIZE, y * TILE_SIZE), water_frames, self.all_sprites)
 
+        # trees
         for obj in tmx_data.get_layer_by_name('Trees'):
-            Tree(pos=(obj.x * TILESIZE, obj.y * TILESIZE),
-                 surf=obj.image,
-                 groups=self.all_sprites,
-                 name=obj.name)
+            Tree((obj.x, obj.y), obj.image, self.all_sprites, obj.name)
 
+        # wildflowers
         for obj in tmx_data.get_layer_by_name('Decoration'):
-            WildFlower(pos=(obj.x * TILESIZE, obj.y * TILESIZE),
-                  surf=obj.image,
-                  groups=self.all_sprites)
+            WildFlower((obj.x, obj.y), obj.image, self.all_sprites)
 
     def run(self, dt):
         self.display_surface.fill('black')
