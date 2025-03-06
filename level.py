@@ -15,12 +15,9 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
         self.all_sprites = CameraGroup()
+        self.collision_sprites = pygame.sprite.Group()
+        self.player = None
         self.setup()
-        self.player = Player((640, 360), self.sprites)
-        Generic(pos=(0, 0),
-                surf=pygame.image.load('graphics/world/ground.png').convert_alpha(),
-                groups=self.all_sprites,
-                z=LAYERS['ground'])
         self.all_sprites.add(self.player)
         self.overlay = Overlay(self.player)
 
@@ -38,7 +35,7 @@ class Level:
 
         # Fence
         for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
-            Generic((x * TILE_SIZE, y * TILE_SIZE), surf, self.all_sprites)
+            Generic((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites])
 
         # water
         water_frames = import_folder('graphics/water')
@@ -47,11 +44,22 @@ class Level:
 
         # trees
         for obj in tmx_data.get_layer_by_name('Trees'):
-            Tree((obj.x, obj.y), obj.image, self.all_sprites, obj.name)
+            Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites], obj.name)
 
         # wildflowers
         for obj in tmx_data.get_layer_by_name('Decoration'):
-            WildFlower((obj.x, obj.y), obj.image, self.all_sprites)
+            WildFlower((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites])
+
+        for x, y, surf in tmx_data.get_layer_by_name('Collision').tiles():
+            Generic((x * TILE_SIZE, y * TILE_SIZE), pygame.Surface((TILE_SIZE, TILE_SIZE)), self.collision_sprites)
+
+        for obj in tmx_data.get_layer_by_name('Player'):
+            if obj.name == 'Start':
+                self.player = Player((obj.x, obj.y), self.sprites, self.collision_sprites)
+        Generic(pos=(0, 0),
+                surf=pygame.image.load('graphics/world/ground.png').convert_alpha(),
+                groups=self.all_sprites,
+                z=LAYERS['ground'])
 
     def run(self, dt):
         self.display_surface.fill('black')
